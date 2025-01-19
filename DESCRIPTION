@@ -1,0 +1,14 @@
+Package: PricingBandits
+Type: Package
+Title: Multi-Armed Bandit Approaches to Pricing Experiments
+Version: 0.1.0
+Authors@R: c(person("Ian N. Weaver", "", role = c("aut", "cre"), email = "i.weaver@nus.edu.sg"), 
+               person("Vineet Kumar", "", role = "aut"), 
+               person("Lalit Jain", "", role = "aut"))
+Maintainer: Ian N. Weaver <i.weaver@nus.edu.sg>
+Description: Implements multiple multi-armed bandit approaches for pricing experiments, as discussed in the paper 'Nonparametric Pricing Bandits Leveraging Informational Externalities to Learn the Demand Curve' by Weaver, Kumar, and Jain.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: stats, evd, Matrix, hash, nloptr, MASS, dplyr, TruncatedNormal, R.utils
+RoxygenNote: 7.3.2
