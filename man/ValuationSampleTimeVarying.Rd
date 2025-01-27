@@ -12,7 +12,7 @@ ValuationSampleTimeVarying(
   ShapeA = NULL,
   ShapeB = NULL,
   Location = NULL,
-  Scale = NULL
+  DistrScale = NULL
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ ValuationSampleTimeVarying(
 
 \item{Location}{Distribution parameter (optional).}
 
-\item{Scale}{Distribution parameter (optional).}
+\item{DistrScale}{Distribution parameter (optional).}
 }
 \value{
 A list containing seasonal valuations and associated shocks.

@@ -4,14 +4,30 @@
 \alias{ValuationSampleLD}
 \title{Left-Digit Valuation Sample}
 \usage{
-ValuationSampleLD(NumSamples, CDFGranularity, LDCDF)
+ValuationSampleLD(
+  NumSamples,
+  CDFGranularity,
+  OneCentScaled,
+  ShapeA,
+  ShapeB,
+  DP,
+  Zeta
+)
 }
 \arguments{
 \item{NumSamples}{Number of valuations to sample.}
 
 \item{CDFGranularity}{Step size for generating the x-axis points of the CDF.}
 
-\item{LDCDF}{Vector of left-digit CDF values.}
+\item{OneCentScaled}{Value of one cent when scaled to 0-1 range.}
+
+\item{ShapeA}{Beta distribution parameter.}
+
+\item{ShapeB}{Beta distribution parameter.}
+
+\item{DP}{Vector of discontinuity points.}
+
+\item{Zeta}{Scaling factor for the gap (jump parameter).}
 }
 \value{
 A vector of sampled valuations.

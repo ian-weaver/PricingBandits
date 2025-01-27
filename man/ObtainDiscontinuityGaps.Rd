@@ -4,7 +4,7 @@
 \alias{ObtainDiscontinuityGaps}
 \title{Discontinuity Gap Calculation}
 \usage{
-ObtainDiscontinuityGaps(OneCentScaled, ShapeA, ShapeB, DP, JumpParameter)
+ObtainDiscontinuityGaps(OneCentScaled, ShapeA, ShapeB, DP, Zeta)
 }
 \arguments{
 \item{OneCentScaled}{Value of one cent when scaled to 0-1 range.}
@@ -15,7 +15,7 @@ ObtainDiscontinuityGaps(OneCentScaled, ShapeA, ShapeB, DP, JumpParameter)
 
 \item{DP}{Vector of discontinuity points.}
 
-\item{JumpParameter}{Scaling factor for the gap.}
+\item{Zeta}{Scaling factor for the gap (jump parameter).}
 }
 \value{
 A vector of discontinuity gaps.

@@ -8,7 +8,7 @@ ValuationSampleStatic(
   NumSamples,
   Type,
   Location = NULL,
-  Scale = NULL,
+  DistrScale = NULL,
   ShapeA = NULL,
   ShapeB = NULL
 )
@@ -20,7 +20,7 @@ ValuationSampleStatic(
 
 \item{Location}{Distribution parameter (optional).}
 
-\item{Scale}{Distribution parameter (optional).}
+\item{DistrScale}{Distribution parameter (optional).}
 
 \item{ShapeA}{Distribution parameter (optional).}
 
