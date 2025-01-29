@@ -23,7 +23,7 @@
 #' @export
 AggregateDataUCB <- function(PricesTested, PurchaseDecisions, TestX) {
   
-  RawData = na.omit(data.frame(PricesTested, PurchaseDecisions))
+  RawData = data.frame(PricesTested, PurchaseDecisions)
   SumData = RawData %>% 
     group_by(PricesTested) %>% 
     summarise(s_t = sum(PurchaseDecisions), n_t = n(), .groups = 'drop')
@@ -62,7 +62,7 @@ AggregateDataTS <- function(PricesTested, PurchaseDecisions, TestX){
   PricesTested       = c(PricesTested, rep(TestX, 2))
   PurchaseDecisions  = c(PurchaseDecisions, rep(0, length(TestX)), rep(1, length(TestX)))
   
-  RawData = na.omit(data.frame(PricesTested, PurchaseDecisions))
+  RawData = data.frame(PricesTested, PurchaseDecisions)
   SumData = RawData %>% 
     group_by(PricesTested) %>% 
     summarise(s_t = sum(PurchaseDecisions), n_t = n(), .groups = 'drop')
@@ -100,7 +100,7 @@ AggregateDataGP <- function(PricesTested, PurchaseDecisions, TestX, sigma2_y, Ba
   PricesTested      = c(PricesTested, rep(0, BatchSize))
   PurchaseDecisions = c(PurchaseDecisions, rep(1, BatchSize))
   
-  RawData  = na.omit(data.frame(PricesTested, PurchaseDecisions))
+  RawData  = data.frame(PricesTested, PurchaseDecisions)
   MeanData = RawData %>% 
     group_by(PricesTested) %>% 
     summarise(PurchaseRates = mean(PurchaseDecisions), .groups = 'drop')

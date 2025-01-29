@@ -13,7 +13,8 @@ MABExperiment(
   NumKnots = NULL,
   Knots = NULL,
   BasisFunctions = NULL,
-  HeteroNoise = FALSE
+  HeteroNoise = FALSE,
+  Reset = NULL
 )
 }
 \arguments{
@@ -33,10 +34,12 @@ MABExperiment(
 
 \item{BasisFunctions}{A matrix of basis functions for monotonic Gaussian Process regression (optional, default is `NULL`).}
 
-\item{HeteroNoise}{Logical; if `TRUE`, allows for heterogeneous noise modeling using the `NoiseSample` function (default is `FALSE`).}
+\item{HeteroNoise}{Logical; if `TRUE`, allows for heterogeneous noise modeling (optional, default is `FALSE`).}
+
+\item{Reset}{Number of consumers before the experiment history is wiped (optional, default is `NULL`).}
 }
 \value{
-A dataframe containing two columns:
+A data frame containing two columns:
   \describe{
     \item{PricesTested}{A vector of prices tested over the experiment.}
     \item{PurchaseDecisions}{A vector of binary purchase decisions corresponding to each price tested.}
