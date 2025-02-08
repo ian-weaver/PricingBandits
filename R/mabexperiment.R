@@ -1,11 +1,6 @@
 #' @title Multi-Armed Bandit Experiment Framework
-#' @description This file contains functions for running multi-armed bandit (MAB) experiments, supporting various policies, Gaussian Process-based methods, and monotonic variants. It allows simulation of consumer purchase decisions under different pricing strategies.
-
-#' Run a Multi-Armed Bandit (MAB) Experiment
-#'
-#' This function simulates a Multi-Armed Bandit experiment using a specified policy and test settings.
-#' It supports both Gaussian Process-based and monotonic variants, with optional heterogeneous noise modeling.
-#'
+#' @description Runs multi-armed bandit (MAB) experiments, supporting TS, UCB, Gaussian Process-based variants, and monotonic and heterogeneous variants. 
+#' It allows simulation of consumer purchase decisions under different MAB policies and underlying WTP distributions.
 #' @param Valuations A vector of consumer valuations for the product, used to simulate purchase decisions.
 #' @param Policy The policy function to be used in the experiment (e.g., UCB, TS, GPTS, GPUCB).
 #' @param TestX A vector of prices (values between 0 and 1) to test.
@@ -93,6 +88,64 @@ MABExperiment <- function(Valuations, Policy, TestX, NumIter, BatchSize,
   Output = data.frame(PricesTested, PurchaseDecisions)
   return(Output)
 }
+
+
+#' @title Multi-Armed Bandit Experiments
+#' @description Allows for multiple MAB experiment simulations to be run
+#' @param Seeds A vector of the length of the number of simulations allowing reproducibility.
+#' @param DGPType The type of dgp ('static', 'timevarying', 'leftdigit', 'empirical').
+#' @param Policy The policy function to be used in the experiment (e.g., UCB, TS, GPTS, GPUCB).
+#' @param TestX A vector of prices (values between 0 and 1) to test.
+#' @param NumIter Number of iterations (time steps) to run the experiment.
+#' @param BatchSize Number of consumers tested before the policy updates its action scores.
+#' @param NumKnots Number of knots for monotonic Gaussian Process variants (monotonic variants).
+#' @param Knots A vector of knot locations for monotonic Gaussian Process regression (monotonic variants).
+#' @param BasisFunctions A matrix of basis functions for monotonic Gaussian Process regression (monotonic variants).
+#' @param HeteroNoise Logical; if `TRUE`, allows for heterogeneous noise modeling (optional, default is `FALSE`).
+#' @param Reset Number of consumers before the experiment history is wiped (optional - time varying).
+#' @param DistrType The distribution type ('beta', 'gumbel', 'frechet', 'gev') (optional).
+#' @param Location Distribution parameter (optional).
+#' @param DistrScale Distribution parameter (optional).
+#' @param ShapeA Distribution parameter (optional).
+#' @param ShapeB Distribution parameter (optional).
+#' @param SeasonLength Length of each season. (timevarying)
+#' @param Rho Maximum seasonal shock (timevarying).
+#' @param CDFGranularity Step size for generating the x-axis points of the CDF (leftdigit).
+#' @param OneCentScaled Value of one cent when scaled to 0-1 range (leftdigit).
+#' @param DP Vector of discontinuity points (leftdigit).
+#' @param Zeta Scaling factor for the gap aka jump parameter (leftdigit).
+#' @param CDF A data frame representing the empirical CDF. The first column 
+#' contains WTP, and the second column contains cumulative probabilities (empirical).
+#' @param Scale Numeric; the scaling factor applied to the WTP data to ensure 
+#' prices are normalized (e.g., between 0 and 1) (empirical).
+#' @return A data frame containing three columns:
+#'   \describe{
+#'     \item{PricesTested}{A vector of prices tested over the experiment.}
+#'     \item{PurchaseDecisions}{A vector of binary purchase decisions corresponding to each price tested.}
+#'     \item{SimulationID}{A vector containing the Simulation ID corresponding to the data}
+#'   }
+#' @export
+MultipleMABExperiments <- function(Seeds, DGPType, Policy, TestX, NumIter, BatchSize,
+                                   NumKnots = NULL, Knots = NULL, BasisFunctions = NULL, 
+                                   HeteroNoise = FALSE, Reset = NULL, DistrType = NULL, Location = NULL, 
+                                   ShapeA = NULL, ShapeB = NULL, SeasonLength = NULL, Rho = NULL, 
+                                   CDFGranularity = NULL, OneCentScaled = NULL, DP = NULL, Zeta = NULL, 
+                                   CDF = NULL, Scale = NULL){
   
+  ResultsList = vector("list", length = length(Seeds))
+  for (i in 1:length(Seeds)){
+    set.seed(Seeds[i])
+    Valuations = ValuationSample(DGPType, NumIter, DistrType, Location, DistrScale, ShapeA, ShapeB, 
+                                 SeasonLength, Rho, CDFGranularity, OneCentScaled, DP, Zeta, CDF, Scale)
+    ResultsList[[i]] = MABExperiment(Valuations, Policy, TestX, NumIter, BatchSize,NumKnots, Knots, 
+                                     BasisFunctions, HeteroNoise, Reset)
+    print(paste("Simulation", i, "complete."))
+  }
+  Results_df = do.call(rbind, ResultsList)
+  Results_df$SimulationID = rep(1:length(Seeds), each = NumIter)
+  return (Results_df)
+}
+  
+
   
   

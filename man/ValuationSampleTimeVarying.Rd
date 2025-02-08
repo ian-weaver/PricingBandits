@@ -8,7 +8,7 @@ ValuationSampleTimeVarying(
   NumSamples,
   SeasonLength,
   Rho,
-  Type,
+  DistrType,
   ShapeA = NULL,
   ShapeB = NULL,
   Location = NULL,
@@ -22,7 +22,7 @@ ValuationSampleTimeVarying(
 
 \item{Rho}{Maximum seasonal shock (uniform distribution between -Rho and Rho).}
 
-\item{Type}{The distribution type ('beta', 'gumbel', 'frechet', 'weibull', 'gev').}
+\item{DistrType}{The distribution type ('beta', 'gumbel', 'frechet', 'weibull', 'gev').}
 
 \item{ShapeA}{Distribution parameter (optional).}
 

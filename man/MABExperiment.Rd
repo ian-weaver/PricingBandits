@@ -46,11 +46,8 @@ A data frame containing two columns:
   }
 }
 \description{
-This file contains functions for running multi-armed bandit (MAB) experiments, supporting various policies, Gaussian Process-based methods, and monotonic variants. It allows simulation of consumer purchase decisions under different pricing strategies.
-Run a Multi-Armed Bandit (MAB) Experiment
-
-This function simulates a Multi-Armed Bandit experiment using a specified policy and test settings.
-It supports both Gaussian Process-based and monotonic variants, with optional heterogeneous noise modeling.
+Runs multi-armed bandit (MAB) experiments, supporting TS, UCB, Gaussian Process-based variants, and monotonic and heterogeneous variants. 
+It allows simulation of consumer purchase decisions under different MAB policies and underlying WTP distributions.
 }
 \examples{
 Valuations <- runif(100, min = 0.1, max = 0.9)

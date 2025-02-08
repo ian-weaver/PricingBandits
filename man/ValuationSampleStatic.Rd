@@ -6,7 +6,7 @@
 \usage{
 ValuationSampleStatic(
   NumSamples,
-  Type,
+  DistrType,
   Location = NULL,
   DistrScale = NULL,
   ShapeA = NULL,
@@ -16,7 +16,7 @@ ValuationSampleStatic(
 \arguments{
 \item{NumSamples}{Number of valuations to sample.}
 
-\item{Type}{The distribution type ('beta', 'gumbel', 'frechet', 'gev').}
+\item{DistrType}{The distribution type ('beta', 'gumbel', 'frechet', 'gev').}
 
 \item{Location}{Distribution parameter (optional).}
 

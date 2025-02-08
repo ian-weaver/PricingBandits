@@ -33,5 +33,5 @@ ValuationSampleLD(
 A vector of sampled valuations.
 }
 \description{
-Generates samples from a left-digit adjusted distribution of valuations.
+Generates samples from a left-digit adjusted Beta distribution of valuations.
 }
