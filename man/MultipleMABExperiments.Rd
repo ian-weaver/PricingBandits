@@ -18,6 +18,7 @@ MultipleMABExperiments(
   Reset = NULL,
   DistrType = NULL,
   Location = NULL,
+  DistrScale = NULL,
   ShapeA = NULL,
   ShapeB = NULL,
   SeasonLength = NULL,
@@ -57,6 +58,8 @@ MultipleMABExperiments(
 
 \item{Location}{Distribution parameter (optional).}
 
+\item{DistrScale}{Distribution parameter (optional).}
+
 \item{ShapeA}{Distribution parameter (optional).}
 
 \item{ShapeB}{Distribution parameter (optional).}
@@ -78,8 +81,6 @@ contains WTP, and the second column contains cumulative probabilities (empirical
 
 \item{Scale}{Numeric; the scaling factor applied to the WTP data to ensure 
 prices are normalized (e.g., between 0 and 1) (empirical).}
-
-\item{DistrScale}{Distribution parameter (optional).}
 }
 \value{
 A data frame containing three columns:

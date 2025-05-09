@@ -128,7 +128,7 @@ MABExperiment <- function(Valuations, Policy, TestX, NumIter, BatchSize,
 MultipleMABExperiments <- function(Seeds, DGPType, Policy, TestX, NumIter, BatchSize,
                                    NumKnots = NULL, Knots = NULL, BasisFunctions = NULL, 
                                    HeteroNoise = FALSE, Reset = NULL, DistrType = NULL, Location = NULL, 
-                                   ShapeA = NULL, ShapeB = NULL, SeasonLength = NULL, Rho = NULL, 
+                                   DistrScale = NULL, ShapeA = NULL, ShapeB = NULL, SeasonLength = NULL, Rho = NULL, 
                                    CDFGranularity = NULL, OneCentScaled = NULL, DP = NULL, Zeta = NULL, 
                                    CDF = NULL, Scale = NULL){
   
@@ -137,7 +137,7 @@ MultipleMABExperiments <- function(Seeds, DGPType, Policy, TestX, NumIter, Batch
     set.seed(Seeds[i])
     Valuations = ValuationSample(DGPType, NumIter, DistrType, Location, DistrScale, ShapeA, ShapeB, 
                                  SeasonLength, Rho, CDFGranularity, OneCentScaled, DP, Zeta, CDF, Scale)
-    ResultsList[[i]] = MABExperiment(Valuations, Policy, TestX, NumIter, BatchSize,NumKnots, Knots, 
+    ResultsList[[i]] = MABExperiment(Valuations, Policy, TestX, NumIter, BatchSize, NumKnots, Knots, 
                                      BasisFunctions, HeteroNoise, Reset)
     print(paste("Simulation", i, "complete."))
   }

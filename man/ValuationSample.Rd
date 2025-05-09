@@ -5,7 +5,7 @@
 \title{Wrapper for Valuation Sample Functions}
 \usage{
 ValuationSample(
-  DGPType,
+  DistrClass,
   NumSamples,
   DistrType = NULL,
   Location = NULL,
@@ -23,7 +23,7 @@ ValuationSample(
 )
 }
 \arguments{
-\item{DGPType}{The type of dgp ('static', 'timevarying', 'leftdigit', 'empirical').}
+\item{DistrClass}{The type of distribution ('analytic', 'empirical', 'leftdigit', 'timevarying').}
 
 \item{NumSamples}{Number of valuations to sample.}
 
@@ -47,7 +47,7 @@ ValuationSample(
 
 \item{DP}{Vector of discontinuity points (leftdigit).}
 
-\item{Zeta}{Scaling factor for the gap aka jump parameter (leftdigit).}
+\item{Zeta}{Scaling factor for the discontinuity gap aka jump parameter (leftdigit).}
 
 \item{CDF}{A data frame representing the empirical CDF. The first column 
 contains WTP, and the second column contains cumulative probabilities (empirical).}

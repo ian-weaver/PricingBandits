@@ -1,8 +1,8 @@
 #' @title Data Generating Processes (DGPs)
 #' @description Functions to generate valuation samples using static, time-varying, and left-digit discontinuity approaches.
-#' @import dplyr Matrix
+#' @import dplyr Matrix ggplot2
 #' @importFrom stats na.omit pbeta rbeta runif sd
-#' @importFrom evd rgumbel rfrechet rgev
+#' @importFrom evd rgumbel rfrechet rgev pgumbel pfrechet pgev
 #' @importFrom nloptr nloptr
 #' @importFrom MASS mvrnorm
 #' @importFrom TruncatedNormal rtmvnorm
@@ -21,7 +21,7 @@
 #' @param ShapeB Distribution parameter (optional).
 #' @return A vector of length NumSamples containing the sampled valuations.
 #' @export
-ValuationSampleStatic <- function(NumSamples, DistrType, Location = NULL, DistrScale = NULL, 
+ValuationSampleAnalytic <- function(NumSamples, DistrType, Location = NULL, DistrScale = NULL, 
                                   ShapeA = NULL, ShapeB = NULL){
   switch(DistrType,
          beta    = rbeta(NumSamples, ShapeA, ShapeB),
@@ -30,13 +30,12 @@ ValuationSampleStatic <- function(NumSamples, DistrType, Location = NULL, DistrS
          gev     = rgev(NumSamples, Location, DistrScale, ShapeA))
 }
 
-
 ### TIME-VARYING CASE ### --------------------------------------------
 
 #' @title Time-Varying Valuation Sample
 #' @description Generates a time-varying valuation sample by introducing seasonal shocks.
 #' @param NumSamples Number of valuations to sample.
-#' @param SeasonLength Length of each season.
+#' @param SeasonLength Number of consumers per season; determines the frequency of seasonal demand shifts.
 #' @param Rho Maximum seasonal shock (uniform distribution between -Rho and Rho).
 #' @param DistrType The distribution type ('beta', 'gumbel', 'frechet', 'weibull', 'gev').
 #' @param ShapeA Distribution parameter (optional).
@@ -47,7 +46,7 @@ ValuationSampleStatic <- function(NumSamples, DistrType, Location = NULL, DistrS
 #' @export
 ValuationSampleTimeVarying <- function(NumSamples, SeasonLength, Rho, DistrType, ShapeA = NULL, 
                                        ShapeB = NULL, Location = NULL, DistrScale = NULL){
-  StaticVals     = ValuationSampleStatic(NumSamples, DistrType, Location, DistrScale, ShapeA, ShapeB)
+  StaticVals     = ValuationSampleAnalytic(NumSamples, DistrType, Location, DistrScale, ShapeA, ShapeB)
   Seasons        = unname(lengths(split(StaticVals, rep(1:ceiling(length(StaticVals)/SeasonLength), 
                                                         each = SeasonLength, length.out = length(StaticVals)))))
   SeasonalShocks = runif(length(Seasons), min = -Rho, max = Rho)
@@ -64,7 +63,7 @@ ValuationSampleTimeVarying <- function(NumSamples, SeasonLength, Rho, DistrType,
 #' @param ShapeA Beta distribution parameter.
 #' @param ShapeB Beta distribution parameter.
 #' @param DP Vector of discontinuity points.
-#' @param Zeta Scaling factor for the gap (jump parameter).
+#' @param Zeta Scaling factor for the discontinuity gap (jump parameter).
 #' @return A vector of discontinuity gaps.
 #' @export
 ObtainDiscontinuityGaps <- function(OneCentScaled, ShapeA, ShapeB, DP, Zeta) {
@@ -81,7 +80,6 @@ ObtainDiscontinuityGaps <- function(OneCentScaled, ShapeA, ShapeB, DP, Zeta) {
   DG = UsualGap * Zeta
   return (DG)
 }
-
 
 #' @title Left-Digit CDF
 #' @description Creates a CDF with discontinuity gaps at specified points.
@@ -126,7 +124,7 @@ Inverse <- function(u, CDF_x, CDF_y){
 #' @param ShapeA Beta distribution parameter.
 #' @param ShapeB Beta distribution parameter.
 #' @param DP Vector of discontinuity points.
-#' @param Zeta Scaling factor for the gap (jump parameter).
+#' @param Zeta Scaling factor for the discontinuity gap (jump parameter).
 #' @return A vector of sampled valuations.
 #' @export
 ValuationSampleLD <- function(NumSamples, CDFGranularity, OneCentScaled, ShapeA, ShapeB, DP, Zeta){
@@ -138,7 +136,7 @@ ValuationSampleLD <- function(NumSamples, CDFGranularity, OneCentScaled, ShapeA,
   return(Valuations)
 }
 
-### Field Data ### ----------------------------------------------
+### EMPIRICAL DATA ### ---------------------------------------------------------
 
 #' @title Empirical Data Valuation Sample
 #' @description Generates samples from an empirical CDF of valuations.
@@ -169,9 +167,11 @@ ValuationSampleEmpirical <- function(NumSamples, CDF, Scale){
   return(Valuations)
 }
 
+### ALL CASES ### --------------------------------------------------------------
+
 #' @title Wrapper for Valuation Sample Functions
 #' @description Generates samples from one of the different types of distributions
-#' @param DGPType The type of dgp ('static', 'timevarying', 'leftdigit', 'empirical').
+#' @param DistrClass The type of distribution ('analytic', 'empirical', 'leftdigit', 'timevarying').
 #' @param NumSamples Number of valuations to sample.
 #' @param DistrType The distribution type ('beta', 'gumbel', 'frechet', 'gev') (optional).
 #' @param Location Distribution parameter (optional).
@@ -183,21 +183,21 @@ ValuationSampleEmpirical <- function(NumSamples, CDF, Scale){
 #' @param CDFGranularity Step size for generating the x-axis points of the CDF (leftdigit).
 #' @param OneCentScaled Value of one cent when scaled to 0-1 range (leftdigit).
 #' @param DP Vector of discontinuity points (leftdigit).
-#' @param Zeta Scaling factor for the gap aka jump parameter (leftdigit).
+#' @param Zeta Scaling factor for the discontinuity gap aka jump parameter (leftdigit).
 #' @param CDF A data frame representing the empirical CDF. The first column 
 #' contains WTP, and the second column contains cumulative probabilities (empirical).
 #' @param Scale Numeric; the scaling factor applied to the WTP data to ensure 
 #' prices are normalized (e.g., between 0 and 1) (empirical).
 #' @return A numeric vector of sampled valuations.
 #' @export
-ValuationSample <- function(DGPType, NumSamples, DistrType = NULL, Location = NULL, DistrScale = NULL, 
+ValuationSample <- function(DistrClass, NumSamples, DistrType = NULL, Location = NULL, DistrScale = NULL, 
                             ShapeA = NULL, ShapeB = NULL, SeasonLength = NULL, Rho = NULL, 
                             CDFGranularity = NULL, OneCentScaled = NULL, DP = NULL, Zeta = NULL, 
                             CDF = NULL, Scale = NULL){
-  switch(DGPType,
-         static  = ValuationSampleStatic(NumSamples, DistrType, Location, DistrScale, ShapeA, ShapeB),
-         timevarying = ValuationSampleTimeVarying(NumSamples, SeasonLength, Rho, DistrType, ShapeA, 
-                                                  ShapeB, Location, DistrScale)[[1]],
+  switch(DistrClass,
+         analytic  = ValuationSampleAnalytic(NumSamples, DistrType, Location, DistrScale, ShapeA, ShapeB),
+         empirical = ValuationSampleEmpirical(NumSamples, CDF, Scale),
          leftdigit = ValuationSampleLD(NumSamples, CDFGranularity, OneCentScaled, ShapeA, ShapeB, DP, Zeta),
-         empirical = ValuationSampleEmpirical(NumSamples, CDF, Scale))
+         timevarying = ValuationSampleTimeVarying(NumSamples, SeasonLength, Rho, DistrType, ShapeA, 
+                                                  ShapeB, Location, DistrScale)[[1]])
 }

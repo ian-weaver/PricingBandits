@@ -18,7 +18,7 @@ ValuationSampleTimeVarying(
 \arguments{
 \item{NumSamples}{Number of valuations to sample.}
 
-\item{SeasonLength}{Length of each season.}
+\item{SeasonLength}{Number of consumers per season; determines the frequency of seasonal demand shifts.}
 
 \item{Rho}{Maximum seasonal shock (uniform distribution between -Rho and Rho).}
 

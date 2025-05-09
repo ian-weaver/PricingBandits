@@ -15,7 +15,7 @@ ObtainDiscontinuityGaps(OneCentScaled, ShapeA, ShapeB, DP, Zeta)
 
 \item{DP}{Vector of discontinuity points.}
 
-\item{Zeta}{Scaling factor for the gap (jump parameter).}
+\item{Zeta}{Scaling factor for the discontinuity gap (jump parameter).}
 }
 \value{
 A vector of discontinuity gaps.
