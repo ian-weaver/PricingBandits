@@ -1,7 +1,7 @@
 Package: PricingBandits
 Type: Package
 Title: Multi-Armed Bandit Approaches to Pricing Experiments
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(person("Ian N. Weaver", "", role = c("aut", "cre"), email = "i.weaver@nus.edu.sg"), 
                person("Vineet Kumar", "", role = "aut"), 
                person("Lalit Jain", "", role = "aut"))

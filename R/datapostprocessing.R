@@ -192,9 +192,9 @@ AppendExRewards <- function(SimData, Prices, NumIter, NumSimulations, SeasonLeng
 #' obtained at each time step.
 #' @export
 CumulativeRewardTV <- function(SimData, NumIter, NumSimulations) {
-  rsEx         = matrix(df$ExpectedReward, nrow = NumSimulations, ncol = NumIter, byrow = TRUE)
+  rsEx         = matrix(SimData$ExpectedReward, nrow = NumSimulations, ncol = NumIter, byrow = TRUE)
   ExColSums    = colSums(rsEx)
-  rsOpt        = matrix(df$OptReward, nrow = NumSimulations, ncol = NumIter, byrow = TRUE)
+  rsOpt        = matrix(SimData$OptReward, nrow = NumSimulations, ncol = NumIter, byrow = TRUE)
   OptColSums   = colSums(rsOpt)
   PctOfOptimal = (cumsum(ExColSums)/cumsum(OptColSums))*100
   return(PctOfOptimal)
