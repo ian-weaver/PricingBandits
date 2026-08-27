@@ -15,10 +15,11 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 `PricingBandits` implements the multi-armed bandit approaches to pricing
 experiments from Weaver, Kumar, and Jain, *Nonparametric Pricing Bandits
 Leveraging Informational Externalities to Learn the Demand Curve* (Marketing
-Science). A firm posts one of a fixed set of candidate prices to each arriving
-consumer, observes only whether they purchase, and must learn the demand curve
-while earning. The package's entry point is a single function,
-`PricingBandit()`.
+Science). The setting is that a firm is trying to maximize profits while 
+experimenting from a fixed set of candidate prices. Each consumer is presented
+with a price and makes a decision whether to purchase if their WTP is greater
+than that price. The algorithm observes only whether they purchase. The 
+package's entry point is a single function, `PricingBandit()`.
 
 ```{r setup}
 library(PricingBandits)
@@ -32,11 +33,10 @@ The package makes no assumption about where they come from — an analytic
 distribution, an empirical CDF, transaction data, anything. A consumer buys
 if and only if their valuation exceeds the posted price.
 
-Here we use a right-skewed Beta(2, 9) population — a hard case, because the
-revenue-maximizing price sits near the bottom of the price grid — with 1,000
-consumers. Every algorithm below is run against **this exact same sequence of
-consumers**, so differences in performance are differences between algorithms,
-not luck of the draw.
+In this vignette, we use a right-skewed Beta(2, 9) population — a difficult case, 
+because the revenue-maximizing price sits near the bottom of the price grid — with 
+1,000 consumers. Every algorithm below is run against **this exact same sequence 
+of consumers**, to minimize differences from luck of the draw.
 
 ```{r valuations, eval = FALSE}
 set.seed(29)
