@@ -17,9 +17,9 @@ experiments from Weaver, Kumar, and Jain, *Nonparametric Pricing Bandits
 Leveraging Informational Externalities to Learn the Demand Curve* (Marketing
 Science). The setting is that a firm is trying to maximize profits while 
 experimenting from a fixed set of candidate prices. Each consumer is presented
-with a price and makes a decision whether to purchase if their WTP is greater
-than that price. The algorithm observes only whether they purchase. The 
-package's entry point is a single function, `PricingBandit()`.
+with a price and makes a decision whether to purchase based on their WTP. The 
+algorithm observes only the price offered and the consumer's purchase decision. 
+The package's entry point is a single function, `PricingBandit()`.
 
 ```{r setup}
 library(PricingBandits)
