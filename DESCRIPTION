@@ -1,0 +1,25 @@
+Package: PricingBandits
+Type: Package
+Title: Multi-Armed Bandit Approaches to Pricing Experiments
+Version: 2.0.0
+Authors@R: c(person("Ian N.", "Weaver", role = c("aut", "cre"), email = "weaver.n.ian@gmail.com"),
+               person("Vineet", "Kumar", role = "aut"),
+               person("Lalit", "Jain", role = "aut"))
+Description: Implements multi-armed bandit approaches for pricing experiments with an
+    unknown demand curve, as developed in Weaver, Kumar, and Jain,
+    "Nonparametric Pricing Bandits Leveraging Informational Externalities to Learn
+    the Demand Curve" <doi:10.1287/mksc.2022.0247>. Includes Upper Confidence Bound (UCB) and
+    Thompson Sampling (TS) baselines, Gaussian process variants ('GP-UCB', 'GP-TS'),
+    monotonic Gaussian process variants that constrain demand to be weakly decreasing
+    in price, and heterogeneous-noise extensions. The
+    willingness-to-pay distribution is fully user-specified via a vector of consumer
+    valuations, so any demand environment can be simulated or replayed.
+License: MIT + file LICENSE
+URL: https://github.com/ian-weaver/PricingBandits
+BugReports: https://github.com/ian-weaver/PricingBandits/issues
+Encoding: UTF-8
+Imports: stats, Matrix, hash, nloptr, MASS, dplyr, TruncatedNormal, R.utils
+Suggests: testthat (>= 3.0.0), knitr, rmarkdown, ggplot2
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

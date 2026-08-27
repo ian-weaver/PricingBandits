@@ -1,0 +1,184 @@
+---
+title: "Getting Started with PricingBandits"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with PricingBandits}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7.5, fig.height = 5)
+```
+
+`PricingBandits` implements the multi-armed bandit approaches to pricing
+experiments from Weaver, Kumar, and Jain, *Nonparametric Pricing Bandits
+Leveraging Informational Externalities to Learn the Demand Curve* (Marketing
+Science). A firm posts one of a fixed set of candidate prices to each arriving
+consumer, observes only whether they purchase, and must learn the demand curve
+while earning. The package's entry point is a single function,
+`PricingBandit()`.
+
+```{r setup}
+library(PricingBandits)
+```
+
+## The experiment environment
+
+Everything about the demand environment is captured by one vector: the
+consumers' **valuations** (willingness to pay), one draw per arriving consumer.
+The package makes no assumption about where they come from — an analytic
+distribution, an empirical CDF, transaction data, anything. A consumer buys
+if and only if their valuation exceeds the posted price.
+
+Here we use a right-skewed Beta(2, 9) population — a hard case, because the
+revenue-maximizing price sits near the bottom of the price grid — with 1,000
+consumers. Every algorithm below is run against **this exact same sequence of
+consumers**, so differences in performance are differences between algorithms,
+not luck of the draw.
+
+```{r valuations, eval = FALSE}
+set.seed(29)
+valuations <- rbeta(1000, 2, 9)
+prices     <- seq(10)/10          # ten candidate prices: 0.1, 0.2, ..., 1.0
+```
+
+## The `PricingBandit()` arguments, one by one
+
+* **`valuations`** — numeric vector, one WTP draw per consumer. Its length sets
+  the experiment length. Prices and valuations are assumed scaled to (0, 1]
+  (rescale your data by its maximum price, and rescale back afterwards).
+* **`prices`** — the candidate price grid (the bandit's arms), values in
+  (0, 1]. Need not be evenly spaced.
+* **`policy`** — which algorithm prices the consumers (see the table below).
+* **`batch_size`** — how many consumers are served between policy updates
+  (default 10). Larger batches mean fewer, cheaper updates but slower learning.
+* **`num_knots`** — for the monotonic (`"-M"`) variants only: the number of
+  knots of the basis expansion used to build monotone demand curves. **The
+  default of 11 is deliberate and should be kept even for dense price grids**
+  (e.g. 100 arms): with many more knots the truncated sampler operates in a
+  near-degenerate, high-dimensional space and can break down.
+* **`hetero`** — if `TRUE`, the observation-noise level at each price is
+  re-estimated every update from the Gaussian-process posterior instead of
+  being held at its conservative Bernoulli bound. Available for all GP
+  variants.
+* **`reset`** — if set to an integer `n`, the experiment history is wiped every
+  `n` consumers. Useful when demand shifts over time (e.g. seasonality) and old
+  observations mislead.
+* **`timeout`** — seconds allowed for each truncated-sampling attempt in the
+  monotonic fallback chain (default 5). Increase on slow machines to give the
+  exact sampler more time; decrease to fail over to the cheaper approximations
+  sooner.
+
+The available policies:
+
+| `policy` | Idea |
+|----------|------|
+| `"UCB"` | Upper Confidence Bound; every price learned independently |
+| `"TS"` | Thompson Sampling with independent Beta posteriors per price |
+| `"GP-UCB"`, `"GP-TS"` | Prices tied together through a Gaussian-process demand curve, so each observation informs *all* prices |
+| `"GP-UCB-M"`, `"GP-TS-M"` | Additionally impose that demand is weakly decreasing in price — the sampled curves are monotone everywhere by construction |
+
+## Running every algorithm on the same consumers
+
+Each call returns a data frame with one row per consumer (`PricesTested`,
+`PurchaseDecisions`), plus a `diagnostics` attribute with fallback counters.
+We reset the seed before each run so the *policies'* randomness is reproducible
+too, while the consumer sequence stays fixed.
+
+```{r runs, eval = FALSE}
+run <- function(policy, hetero = FALSE) {
+  set.seed(1)
+  PricingBandit(valuations, prices,
+                policy     = policy,
+                batch_size = 10,
+                hetero     = hetero)
+}
+
+# Baselines: each arm learned independently
+out_ucb  <- run("UCB")
+out_ts   <- run("TS")
+
+# Gaussian-process variants: the demand curve correlates the arms
+out_gpucb <- run("GP-UCB")
+out_gpts  <- run("GP-TS")
+
+# Monotonic variants (basis-function construction; num_knots = 11 default)
+out_gpucb_m <- run("GP-UCB-M")
+out_gpts_m  <- run("GP-TS-M")
+
+# Heterogeneous-noise versions of the monotonic algorithms
+out_gpucb_m_h <- run("GP-UCB-M", hetero = TRUE)
+out_gpts_m_h  <- run("GP-TS-M",  hetero = TRUE)
+```
+
+To judge performance we score each posted price by its *expected* revenue
+`p * (1 - F(p))` under the true WTP distribution, and track cumulative revenue
+as a percentage of what the true optimal price would have earned:
+
+```{r metric, eval = FALSE}
+expected_reward <- prices * (1 - pbeta(prices, 2, 9))
+grid            <- seq(1e-6, 1, 1e-6)
+true_optimal    <- max(grid * (1 - pbeta(grid, 2, 9)))
+
+score <- function(out) {
+  er <- expected_reward[match(out$PricesTested, prices)]
+  cumsum(er) / (seq_along(er) * true_optimal) * 100
+}
+```
+
+## Results
+
+The results below were precomputed with exactly the code above (they ship with
+the package so this vignette builds quickly).
+
+```{r plot, echo = TRUE}
+res <- readRDS("vignette_results.rds")$results
+
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  library(ggplot2)
+  res$family <- ifelse(grepl("TS", res$policy), "Thompson Sampling family",
+                       "UCB family")
+  res$variant <- ifelse(res$hetero, "heterogeneous noise", "standard")
+  ggplot(res, aes(consumer, cum_pct_optimal, colour = policy,
+                  linetype = variant)) +
+    geom_line(linewidth = 0.6) +
+    facet_wrap(~ family) +
+    labs(x = "Consumers", y = "Cumulative revenue (% of true optimal)",
+         colour = NULL, linetype = NULL,
+         title = "All algorithms on the same 1,000 Beta(2,9) consumers") +
+    coord_cartesian(ylim = c(0, 100)) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+} else {
+  final <- res[res$consumer == 1000, c("label", "cum_pct_optimal")]
+  final[order(-final$cum_pct_optimal), ]
+}
+```
+
+The ordering reflects the paper's central result: exploiting the informational
+externalities — first correlation across prices (GP), then monotonicity of
+demand (the "-M" variants) — dramatically reduces the cost of learning,
+especially in this hard case where the optimal price sits at the low end of
+the grid.
+
+Final standings after 1,000 consumers:
+
+```{r table, echo = FALSE}
+final <- res[res$consumer == 1000, c("label", "cum_pct_optimal")]
+final <- final[order(-final$cum_pct_optimal), ]
+knitr::kable(final, digits = 1, row.names = FALSE,
+             col.names = c("Algorithm", "% of optimal (cumulative, 1000 consumers)"))
+```
+
+## Diagnostics
+
+Each run counts how often its numerical fallback paths fired (hyperparameter
+optimization failing back to priors, truncated-sampler timeouts, last-resort
+samplers). In normal operation all counters are zero; a run with many
+last-resort events is telling you the sampler struggled with your price grid.
+
+```{r diag, eval = FALSE}
+attr(out_gpts_m, "diagnostics")
+```

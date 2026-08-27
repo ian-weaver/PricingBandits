@@ -1,0 +1,17 @@
+citHeader("To cite PricingBandits in publications use:")
+
+bibentry(
+  bibtype  = "Article",
+  title    = "Nonparametric Pricing Bandits Leveraging Informational Externalities to Learn the Demand Curve",
+  author   = c(person("Ian N.", "Weaver"),
+               person("Vineet", "Kumar"),
+               person("Lalit", "Jain")),
+  journal  = "Marketing Science",
+  year     = "2025",
+  doi      = "10.1287/mksc.2022.0247",
+  textVersion = paste(
+    "Weaver, I. N., Kumar, V., & Jain, L.",
+    "Nonparametric Pricing Bandits Leveraging Informational Externalities to Learn the Demand Curve.",
+    "Marketing Science. doi:10.1287/mksc.2022.0247"
+  )
+)
