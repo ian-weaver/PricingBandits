@@ -67,13 +67,20 @@ break down, so keep it modest even for dense price grids. `timeout` (default
 advances; raise it on slow machines, lower it to fail over to cheaper
 approximations sooner.
 
-## How the policies compare
+## Policy Comparison Example
 
-All six policies priced the same 1,000 consumers (willingness to pay drawn
-from Beta(2, 9) — a hard case, with the optimal price at the low end of the
-grid). Each informational externality helps: tying prices together through a
-Gaussian-process demand curve lifts the independent-arm baselines, and adding
-the monotonicity constraint lifts the GP policies again.
+Running each policy with one seed on the same 1,000 consumers — willingness
+to pay drawn from a Beta(2, 9) distribution — gives the results below. To
+compare policies, score each price the bandit posted by its expected revenue
+under the true distribution, and track the cumulative total as a percentage
+of what always charging the optimal price would have earned:
+
+```r
+expected_revenue <- prices * (1 - pbeta(prices, 2, 9))   # true revenue at each price
+optimal          <- max(expected_revenue)
+earned           <- expected_revenue[match(out$PricesTested, prices)]
+pct_of_optimal   <- cumsum(earned) / (seq_along(earned) * optimal) * 100
+```
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="man/figures/README-comparison-dark.png">
