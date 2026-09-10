@@ -76,8 +76,9 @@ under the true distribution, and track the cumulative total as a percentage
 of what always charging the optimal price would have earned:
 
 ```r
-expected_revenue <- prices * (1 - pbeta(prices, 2, 9))   # true revenue at each price
-optimal          <- max(expected_revenue)
+expected_revenue <- prices * (1 - pbeta(prices, 2, 9))   # true revenue at each posted price
+grid             <- seq(1e-6, 1, 1e-6)
+optimal          <- max(grid * (1 - pbeta(grid, 2, 9)))  # best any price could do
 earned           <- expected_revenue[match(out$PricesTested, prices)]
 pct_of_optimal   <- cumsum(earned) / (seq_along(earned) * optimal) * 100
 ```
