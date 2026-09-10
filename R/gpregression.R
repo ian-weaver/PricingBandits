@@ -74,10 +74,10 @@ PosteriorPrediction <- function(TrainX, TrainY, TestX, TestD, sigma_f, l, sigma2
   TestIndex  = c(rep(0, length(TestX)), rep(1, length(TestD)))
   TestAll    = c(TestX, TestD)
   
-  K_00 = JointCovFromKernel(TrainX, TrainIndex, RBFKernel_All, sigma_f, l)
-  K_11 = JointCovFromKernel(TestAll, TestIndex, RBFKernel_All, sigma_f, l)
+  K_00 = JointCovFromKernel(TrainX, TrainIndex, RBFKernel, sigma_f, l)
+  K_11 = JointCovFromKernel(TestAll, TestIndex, RBFKernel, sigma_f, l)
   K_01 = outer(1:length(TrainX), 1:length(TestAll),
-               function(i, j) {RBFKernel_All(TrainX[i], TestAll[j], TrainIndex[i], TestIndex[j], sigma_f, l)})
+               function(i, j) {RBFKernel(TrainX[i], TestAll[j], sigma_f, l, TrainIndex[i], TestIndex[j])})
   
   MeanPred = t(K_01) %*% (chol2inv(chol(K_00 + sigma2_y*diag(nrow(K_00))))) %*% TrainY
   CovPred  = K_11 - t(K_01) %*% (chol2inv(chol(K_00 + sigma2_y*diag(nrow(K_00))))) %*% K_01

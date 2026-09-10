@@ -1,60 +1,37 @@
 #' @title Kernel Functions
-#' @description Collection of functions to compute RBF kernels and covariance matrices.
+#' @description Functions to compute the RBF kernel (including its derivative
+#' cross-covariances) and the covariance matrices built from it.
 
-### Kernels ### ---------------------------------------------
+### Kernel ### ---------------------------------------------
 
 #' @title Radial Basis Function (RBF) Kernel
-#' @description Calculates the RBF kernel between two points.
+#' @description Calculates the RBF kernel between two points, either of which may
+#' represent the first derivative of the underlying function rather than a
+#' function value. The derivative orders `d_i` and `d_j` (0 = function value,
+#' 1 = first derivative; default 0) select the appropriate covariance:
+#' value-value, value-derivative, derivative-value, or derivative-derivative.
 #' @param x_i A point with d dimensions.
 #' @param x_j A point with d dimensions.
 #' @param sigma_f Hyperparameter defining the vertical scale.
 #' @param l Hyperparameter defining the horizontal scale.
-#' @return Gaussian kernel value between two points.
+#' @param d_i Derivative order of `x_i` (0 or 1; default 0).
+#' @param d_j Derivative order of `x_j` (0 or 1; default 0).
+#' @return Kernel value between the two (possibly derivative) points.
+#' @examples
+#' RBFKernel(0.2, 0.5, 0.7, 0.2)                    # value-value
+#' RBFKernel(0.2, 0.5, 0.7, 0.2, d_j = 1)           # value-derivative
+#' RBFKernel(0.2, 0.5, 0.7, 0.2, d_i = 1, d_j = 1)  # derivative-derivative
 #' @export
-RBFKernel <- function(x_i, x_j, sigma_f, l) {
-  sigma_f^2 * exp(-(x_i - x_j)^2 / (2 * l^2))
-}
-
-#' @title RBF Kernel (Point to Derivative)
-#' @description Calculates the RBF kernel between a point and derivative.
-#' @param x_i A point with d dimensions.
-#' @param x_j A point (derivative) with d dimensions.
-#' @param sigma_f Hyperparameter defining the vertical scale.
-#' @param l Hyperparameter defining the horizontal scale.
-#' @return Kernel value between the point and derivative.
-#' @export
-RBFKernel_01 <- function(x_i, x_j, sigma_f, l) {
-  sigma_f^2 / l^2 * (x_i - x_j) * exp(-(x_i - x_j)^2 / (2*l^2))
-}
-
-#' @title RBF Kernel (Derivative to Derivative)
-#' @description Calculates the RBF kernel between two derivatives.
-#' @param x_i A point (derivative) with d dimensions.
-#' @param x_j A point (derivative) with d dimensions.
-#' @param sigma_f Hyperparameter defining the vertical scale.
-#' @param l Hyperparameter defining the horizontal scale.
-#' @return Kernel value between the two derivatives.
-#' @export
-RBFKernel_11 <- function(x_i, x_j, sigma_f, l) {
-  sigma_f^2 / l^4 * (l^2 - (x_i - x_j)^2) * exp(-(x_i - x_j)^2 / (2*l^2))
-}
-
-#' @title Generalized RBF Kernel
-#' @description Computes RBF kernels for combinations of points and derivatives.
-#' @param x_i A point with d dimensions.
-#' @param x_j A point with d dimensions.
-#' @param d_i Order of derivative for point x_i (0 or 1).
-#' @param d_j Order of derivative for point x_j (0 or 1).
-#' @param sigma_f Hyperparameter defining the vertical scale.
-#' @param l Hyperparameter defining the horizontal scale.
-#' @return Kernel value based on the derivative orders of the input points.
-#' @export
-RBFKernel_All <- function(x_i, x_j, d_i, d_j, sigma_f, l) {
+RBFKernel <- function(x_i, x_j, sigma_f, l, d_i = 0, d_j = 0) {
+  # fast path for the common all-values case (e.g. likelihood evaluations)
+  if (all(d_i == 0) && all(d_j == 0)) {
+    return(sigma_f^2 * exp(-(x_i - x_j)^2 / (2 * l^2)))
+  }
   case_when(
-    d_i == 0 & d_j == 0 ~ RBFKernel(x_i, x_j, sigma_f, l),
-    d_i == 0 & d_j == 1 ~ RBFKernel_01(x_i, x_j, sigma_f, l),
-    d_i == 1 & d_j == 0 ~ RBFKernel_01(x_j, x_i, sigma_f, l),
-    d_i == 1 & d_j == 1 ~ RBFKernel_11(x_i, x_j, sigma_f, l)
+    d_i == 0 & d_j == 0 ~ sigma_f^2 * exp(-(x_i - x_j)^2 / (2 * l^2)),
+    d_i == 0 & d_j == 1 ~ sigma_f^2 / l^2 * (x_i - x_j) * exp(-(x_i - x_j)^2 / (2*l^2)),
+    d_i == 1 & d_j == 0 ~ sigma_f^2 / l^2 * (x_j - x_i) * exp(-(x_j - x_i)^2 / (2*l^2)),
+    d_i == 1 & d_j == 1 ~ sigma_f^2 / l^4 * (l^2 - (x_i - x_j)^2) * exp(-(x_i - x_j)^2 / (2*l^2))
   )
 }
 
@@ -84,5 +61,5 @@ CovarianceFromKernel <- function(X1, X2, kernel, sigma_f, l) {
 #' @export
 JointCovFromKernel <- function(X, Index, kernel, sigma_f, l) {
   outer(1:length(X), 1:length(X),
-        function(i, j) kernel(X[i], X[j], Index[i], Index[j], sigma_f, l))
+        function(i, j) kernel(X[i], X[j], sigma_f, l, Index[i], Index[j]))
 }

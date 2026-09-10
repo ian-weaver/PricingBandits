@@ -4,7 +4,7 @@
 \alias{RBFKernel}
 \title{Kernel Functions}
 \usage{
-RBFKernel(x_i, x_j, sigma_f, l)
+RBFKernel(x_i, x_j, sigma_f, l, d_i = 0, d_j = 0)
 }
 \arguments{
 \item{x_i}{A point with d dimensions.}
@@ -14,12 +14,26 @@ RBFKernel(x_i, x_j, sigma_f, l)
 \item{sigma_f}{Hyperparameter defining the vertical scale.}
 
 \item{l}{Hyperparameter defining the horizontal scale.}
+
+\item{d_i}{Derivative order of `x_i` (0 or 1; default 0).}
+
+\item{d_j}{Derivative order of `x_j` (0 or 1; default 0).}
 }
 \value{
-Gaussian kernel value between two points.
+Kernel value between the two (possibly derivative) points.
 }
 \description{
-Collection of functions to compute RBF kernels and covariance matrices.
+Functions to compute the RBF kernel (including its derivative
+cross-covariances) and the covariance matrices built from it.
 
-Calculates the RBF kernel between two points.
+Calculates the RBF kernel between two points, either of which may
+represent the first derivative of the underlying function rather than a
+function value. The derivative orders `d_i` and `d_j` (0 = function value,
+1 = first derivative; default 0) select the appropriate covariance:
+value-value, value-derivative, derivative-value, or derivative-derivative.
+}
+\examples{
+RBFKernel(0.2, 0.5, 0.7, 0.2)                    # value-value
+RBFKernel(0.2, 0.5, 0.7, 0.2, d_j = 1)           # value-derivative
+RBFKernel(0.2, 0.5, 0.7, 0.2, d_i = 1, d_j = 1)  # derivative-derivative
 }

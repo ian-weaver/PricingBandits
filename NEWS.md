@@ -1,3 +1,15 @@
+# PricingBandits 2.1.0
+
+* The four kernel functions are consolidated into one: `RBFKernel()` now takes
+  derivative orders `d_i` and `d_j` (0 = function value, 1 = first derivative;
+  default 0) and covers the value-value, value-derivative, derivative-value,
+  and derivative-derivative cases itself. `RBFKernel_01()`, `RBFKernel_11()`,
+  and `RBFKernel_All()` are removed. Results are unchanged: the new function
+  performs the identical arithmetic, verified bit-for-bit against 2.0.0 at the
+  kernel, posterior, and full seed-matched experiment level.
+* DESCRIPTION reference formatted per CRAN guidance (year added, quotes
+  removed from acronyms).
+
 # PricingBandits 2.0.0
 
 First public release of the streamlined package, extracted from the replication

@@ -6,7 +6,7 @@
 \alias{PricingBandits-package}
 \title{PricingBandits: Multi-Armed Bandit Approaches to Pricing Experiments}
 \description{
-Implements multi-armed bandit approaches for pricing experiments with an unknown demand curve, as developed in Weaver, Kumar, and Jain, "Nonparametric Pricing Bandits Leveraging Informational Externalities to Learn the Demand Curve" (Marketing Science). Includes Upper Confidence Bound (UCB) and Thompson Sampling (TS) baselines, Gaussian process variants ('GP-UCB', 'GP-TS'), monotonic Gaussian process variants that constrain demand to be weakly decreasing in price, and heterogeneous-noise extensions. The willingness-to-pay distribution is fully user-specified via a vector of consumer valuations, so any demand environment can be simulated or replayed.
+Implements multi-armed bandit approaches for pricing experiments with an unknown demand curve, as developed in Weaver, Kumar, and Jain (2025) "Nonparametric Pricing Bandits Leveraging Informational Externalities to Learn the Demand Curve" \doi{10.1287/mksc.2022.0247}. Includes Upper Confidence Bound (UCB) and Thompson Sampling (TS) baselines, Gaussian process variants (GP-UCB, GP-TS), monotonic Gaussian process variants that constrain demand to be weakly decreasing in price, and heterogeneous-noise extensions. The willingness-to-pay distribution is fully user-specified via a vector of consumer valuations, so any demand environment can be simulated or replayed.
 }
 \seealso{
 Useful links:
@@ -17,11 +17,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Ian N. Weaver \email{i.weaver@nus.edu.sg}
+\strong{Maintainer}: Ian N. Weaver \email{weaver.n.ian@gmail.com}
 
 Authors:
 \itemize{
-  \item Ian N. Weaver \email{i.weaver@nus.edu.sg}
+  \item Ian N. Weaver \email{weaver.n.ian@gmail.com}
   \item Vineet Kumar
   \item Lalit Jain
 }
