@@ -67,6 +67,20 @@ break down, so keep it modest even for dense price grids. `timeout` (default
 advances; raise it on slow machines, lower it to fail over to cheaper
 approximations sooner.
 
+## How the policies compare
+
+All six policies priced the same 1,000 consumers (willingness to pay drawn
+from Beta(2, 9) — a hard case, with the optimal price at the low end of the
+grid). Each informational externality helps: tying prices together through a
+Gaussian-process demand curve lifts the independent-arm baselines, and adding
+the monotonicity constraint lifts the GP policies again.
+
+![Cumulative revenue as a percentage of the optimal price's revenue, for all six policies on the same 1,000 simulated consumers](man/figures/README-comparison.png)
+
+See the [package vignette](https://CRAN.R-project.org/package=PricingBandits)
+for the full walk-through this figure comes from, including the
+heterogeneous-noise variants and every argument explained.
+
 ## Diagnostics
 
 Every run counts the numerical fallback paths (hyperparameter-optimization
