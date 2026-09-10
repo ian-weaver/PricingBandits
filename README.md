@@ -75,7 +75,10 @@ grid). Each informational externality helps: tying prices together through a
 Gaussian-process demand curve lifts the independent-arm baselines, and adding
 the monotonicity constraint lifts the GP policies again.
 
-![Cumulative revenue as a percentage of the optimal price's revenue, for all six policies on the same 1,000 simulated consumers](man/figures/README-comparison.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="man/figures/README-comparison-dark.png">
+  <img alt="Cumulative revenue as a percentage of the optimal price's revenue, for all six policies on the same 1,000 simulated consumers" src="man/figures/README-comparison.png">
+</picture>
 
 See the [package vignette](https://CRAN.R-project.org/package=PricingBandits)
 for the full walk-through this figure comes from, including the
