@@ -14,9 +14,15 @@ package are validated seed-for-seed bit-identical against it.
 > Looking for the **Python version**? See
 > [pricingbandits-py](https://github.com/ian-weaver/pricingbandits-py).
 
+[![CRAN status](https://www.r-pkg.org/badges/version/PricingBandits)](https://CRAN.R-project.org/package=PricingBandits)
+
 ## Installation
 
 ```r
+# from CRAN (released version):
+install.packages("PricingBandits")
+
+# or the development version from GitHub:
 # install.packages("devtools")
 devtools::install_github("ian-weaver/PricingBandits")
 ```
