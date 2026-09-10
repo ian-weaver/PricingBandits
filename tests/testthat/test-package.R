@@ -99,3 +99,28 @@ test_that("seeded runs are reproducible", {
   }
   expect_identical(run()$PricesTested, run()$PricesTested)
 })
+
+
+test_that("UCB and TS trajectories are unchanged across package versions", {
+  # Fixed-seed regression goldens (Beta(2,9), 200 consumers, 10 arms, batch 10),
+  # recorded from v2.0.0 and verified bit-identical after the v2.1.0 kernel
+  # consolidation. UCB is deterministic given the valuations; TS depends only
+  # on R's (platform-independent) RNG. The GP policies are excluded here
+  # because their exact draws depend on the BLAS/LAPACK build; they are
+  # regression-verified against the replication code outside the test suite.
+  run <- function(pol) {
+    set.seed(42)
+    v <- rbeta(200, 2, 9)
+    PricingBandit(v, seq(10)/10, policy = pol, batch_size = 10)
+  }
+  ucb <- run("UCB")
+  expect_identical(ucb$PricesTested[1:20]*10, c(rep(10, 10), rep(9, 10)))
+  expect_identical(as.vector(table(factor(ucb$PricesTested, levels = seq(10)/10))),
+                   c(10L, 10L, 10L, 10L, 10L, 20L, 20L, 30L, 40L, 40L))
+  expect_identical(sum(ucb$PurchaseDecisions), 12)
+  ts <- run("TS")
+  expect_identical(ts$PricesTested[1:20]*10, c(rep(9, 10), rep(10, 10)))
+  expect_identical(as.vector(table(factor(ts$PricesTested, levels = seq(10)/10))),
+                   c(0L, 20L, 30L, 10L, 10L, 30L, 20L, 20L, 30L, 30L))
+  expect_identical(sum(ts$PurchaseDecisions), 10)
+})
