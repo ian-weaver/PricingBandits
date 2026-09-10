@@ -128,10 +128,30 @@ score <- function(out) {
 }
 ```
 
+Finally, we collect the eight runs into one long data frame — one row per
+consumer per run — which is the `res` object everything below plots from:
+
+```{r assemble, eval = FALSE}
+runs <- list("UCB"    = out_ucb,     "TS"      = out_ts,
+             "GP-UCB" = out_gpucb,   "GP-TS"   = out_gpts,
+             "GP-UCB-M" = out_gpucb_m, "GP-TS-M" = out_gpts_m,
+             "GP-UCB-M (hetero)" = out_gpucb_m_h,
+             "GP-TS-M (hetero)"  = out_gpts_m_h)
+
+res <- do.call(rbind, lapply(names(runs), function(nm) {
+  data.frame(policy   = sub(" (hetero)", "", nm, fixed = TRUE),
+             hetero   = grepl("hetero", nm),
+             label    = nm,
+             consumer = seq_along(valuations),
+             cum_pct_optimal = score(runs[[nm]]))
+}))
+```
+
 ## Results
 
-The results below were precomputed with exactly the code above (they ship with
-the package so this vignette builds quickly).
+Because the monotonic runs take a few minutes, the `res` produced by the code
+above ships precomputed with the package, so this vignette builds in seconds;
+here we simply load it:
 
 ```{r plot, echo = TRUE}
 res <- readRDS("vignette_results.rds")$results
